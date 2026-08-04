@@ -163,15 +163,21 @@ def test_remove_translated_suffix(file_name: str, expected: str) -> None:
         # Lists
         (list(range(50)), [50]),
         (list(range(850)), [400, 400, 50]),
-        ([], [0]),
+        ([], []),
         # Generators
         ((x for x in range(50)), [50]),
         ((x for x in range(850)), [400, 400, 50]),
-        ((x for x in []), [0]),
+        ((x for x in []), []),
     ],
 )
 def test_iterate_batch(data, expected_lengths):
-    for batch, expected in zip(list(iterate_batch(data, 400)), expected_lengths):
+    batches = list(iterate_batch(data, 400))
+
+    # zip() silently truncates to the shorter sequence, so it can't catch a
+    # missing or extra batch on its own (e.g. it would let a dropped final
+    # partial batch pass unnoticed). Assert the batch count explicitly first.
+    assert len(batches) == len(expected_lengths)
+    for batch, expected in zip(batches, expected_lengths):
         assert len(batch) == expected
 
 
