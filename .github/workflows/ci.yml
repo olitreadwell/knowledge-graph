@@ -88,9 +88,11 @@ jobs:
 
   deploy_prefect_sandbox:
     name: "Sandbox"
-    # Skip on repos (e.g. forks) that don't have the sandbox deploy secrets
-    # configured, instead of failing on missing AWS credentials.
-    if: ${{ secrets.AWS_ACCESS_KEY_ID_SANDBOX != '' }}
+    # Only the canonical repo has the sandbox deploy secrets configured.
+    # Skip on forks instead of failing on missing AWS credentials.
+    # (A job-level `if` can't read the secrets context directly, so we
+    # check the repo instead of the secret.)
+    if: github.repository == 'climatepolicyradar/knowledge-graph'
     uses: ./.github/workflows/prefect_deploy.yml
     with:
       aws-env: sandbox
