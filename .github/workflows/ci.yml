@@ -88,6 +88,9 @@ jobs:
 
   deploy_prefect_sandbox:
     name: "Sandbox"
+    # Skip on repos (e.g. forks) that don't have the sandbox deploy secrets
+    # configured, instead of failing on missing AWS credentials.
+    if: ${{ secrets.AWS_ACCESS_KEY_ID_SANDBOX != '' }}
     uses: ./.github/workflows/prefect_deploy.yml
     with:
       aws-env: sandbox
